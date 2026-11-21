@@ -1,0 +1,108 @@
+<?php
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \StorvixLabs\CacheInsight\ViewModel\Report $viewModel */
+$viewModel = $block->getData('view_model');
+$summary = $viewModel->getSummary();
+$outcomes = $viewModel->getOutcomes();
+$pages = $viewModel->getPageTypes();
+$causeTables = [
+    'block' => [__('Blocks that stop caching'), __('These blocks have cacheable="false" in the layout; any page that renders one is never cached.')],
+    'set_cookie' => [__('Cookies set by pages that missed'), __('A cookie set by a page makes shared caches (Varnish, CDN) refuse to store it. PHPSESSID on a normal page means a session was started.')],
+    'cookie' => [__('Cookies sent with requests that missed'), __('Seen on the request. Cookies other than Magento\'s own, or a changing X-Magento-Vary, split the cache into many variations or keep requests away from it.')],
+];
+?>
+<form class="storvixlabs-cache-filter" method="get" action="<?= $escaper->escapeUrl($block->getUrl('*/*/index')) ?>">
+    <div>
+        <label for="ci-days"><?= $escaper->escapeHtml(__('Last days')) ?></label>
+        <input type="number" min="1" max="90" id="ci-days" name="days" class="admin__control-text"
+               value="<?= (int)$viewModel->getDays() ?>">
+    </div>
+    <button type="submit" class="action-default primary"><?= $escaper->escapeHtml(__('Show')) ?></button>
+</form>
+
+<?php if (!$viewModel->isEnabled()): ?>
+    <div class="message message-notice"><div><?= $escaper->escapeHtml(__('Logging is off. Turn it on in Stores > Configuration > Advanced > Cache Insight, browse the store, then come back.')) ?></div></div>
+<?php endif; ?>
+<?php if (!$viewModel->isPageCacheEnabled()): ?>
+    <div class="message message-warning"><div><?= $escaper->escapeHtml(__('Full-page cache is disabled, so every page is a miss.')) ?></div></div>
+<?php elseif (!$viewModel->canCountHits()): ?>
+    <div class="message message-notice"><div><?= $escaper->escapeHtml(__('Hits are not counted (Varnish, or hit sampling is 0): only requests that reached PHP are shown. Read the hit rate from Varnish (varnishstat) and use this report to see why pages miss.')) ?></div></div>
+<?php endif; ?>
+
+<div class="storvixlabs-cache-kpis">
+    <div class="storvixlabs-cache-kpi"><strong><?= (int)$summary['misses'] ?></strong><span><?= $escaper->escapeHtml(__('Requests handled by PHP')) ?></span></div>
+    <?php if ($summary['rate'] !== null): ?>
+        <div class="storvixlabs-cache-kpi"><strong><?= $escaper->escapeHtml(number_format($summary['rate'], 1)) ?>%</strong><span><?= $escaper->escapeHtml(__('Hit rate (estimated, %1 hits)', $summary['hits'])) ?></span></div>
+    <?php endif; ?>
+    <?php foreach ($outcomes as $code => $info): ?>
+        <?php if (!empty($summary['by_outcome'][$code])): ?>
+            <div class="storvixlabs-cache-kpi"><strong><?= (int)$summary['by_outcome'][$code] ?></strong><span><?= $escaper->escapeHtml($info['label']) ?></span></div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+</div>
+
+<h2><?= $escaper->escapeHtml(__('Misses by page type')) ?></h2>
+<div class="admin__table-wrapper">
+    <table class="data-grid">
+        <thead><tr>
+            <th class="data-grid-th"><?= $escaper->escapeHtml(__('Page type')) ?></th>
+            <th class="data-grid-th storvixlabs-cache-num"><?= $escaper->escapeHtml(__('Total')) ?></th>
+            <?php foreach ($outcomes as $info): ?>
+                <th class="data-grid-th storvixlabs-cache-num"><?= $escaper->escapeHtml($info['label']) ?></th>
+            <?php endforeach; ?>
+        </tr></thead>
+        <tbody>
+        <?php if ($pages === []): ?>
+            <tr><td colspan="<?= count($outcomes) + 2 ?>"><?= $escaper->escapeHtml(__('No data in this period.')) ?></td></tr>
+        <?php endif; ?>
+        <?php foreach ($pages as $page): ?>
+            <tr>
+                <td><code><?= $escaper->escapeHtml($page['page_type']) ?></code></td>
+                <td class="storvixlabs-cache-num"><?= (int)$page['total'] ?></td>
+                <?php foreach (array_keys($outcomes) as $code): ?>
+                    <td class="storvixlabs-cache-num"><?= (int)($page['outcomes'][$code] ?? 0) ?: '' ?></td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<ul class="storvixlabs-cache-note">
+    <?php foreach ($outcomes as $code => $info): ?>
+        <?php if (!empty($summary['by_outcome'][$code])): ?>
+            <li><strong><?= $escaper->escapeHtml($info['label']) ?>:</strong> <?= $escaper->escapeHtml($info['advice']) ?></li>
+        <?php endif; ?>
+    <?php endforeach; ?>
+</ul>
+
+<?php foreach ($causeTables as $kind => [$title, $help]): ?>
+    <?php $causes = $viewModel->getCauses($kind); ?>
+    <h2><?= $escaper->escapeHtml($title) ?></h2>
+    <p class="storvixlabs-cache-note"><?= $escaper->escapeHtml($help) ?></p>
+    <div class="admin__table-wrapper">
+        <table class="data-grid">
+            <thead><tr>
+                <th class="data-grid-th"><?= $escaper->escapeHtml($kind === 'block' ? __('Block') : __('Cookie')) ?></th>
+                <th class="data-grid-th storvixlabs-cache-num"><?= $escaper->escapeHtml(__('Requests')) ?></th>
+                <th class="data-grid-th"><?= $escaper->escapeHtml(__('Seen on')) ?></th>
+            </tr></thead>
+            <tbody>
+            <?php if ($causes === []): ?>
+                <tr><td colspan="3"><?= $escaper->escapeHtml(__('Nothing recorded.')) ?></td></tr>
+            <?php endif; ?>
+            <?php foreach ($causes as $cause): ?>
+                <tr>
+                    <td><code><?= $escaper->escapeHtml($cause['name']) ?></code></td>
+                    <td class="storvixlabs-cache-num"><?= (int)$cause['requests'] ?></td>
+                    <td><?= $escaper->escapeHtml(implode(', ', array_map(
+                        static fn (string $page, int $count): string => $page . ' (' . $count . ')',
+                        array_keys($cause['pages']),
+                        $cause['pages']
+                    ))) ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php endforeach; ?>

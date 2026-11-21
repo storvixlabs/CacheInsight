@@ -1,0 +1,18 @@
+{
+    "storvixlabs_cacheinsight_daily": {
+        "column": {
+            "day": true, "page_type": true, "outcome": true, "store_id": true, "requests": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "storvixlabs_cacheinsight_cause": {
+        "column": {
+            "day": true, "kind": true, "name": true, "page_type": true, "requests": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

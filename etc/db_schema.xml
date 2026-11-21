@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="storvixlabs_cacheinsight_daily" resource="default" engine="innodb" comment="StorvixLabs Cache Insight: requests per day, page type and outcome">
+        <column xsi:type="date" name="day" nullable="false" comment="Day (UTC)"/>
+        <column xsi:type="varchar" name="page_type" nullable="false" length="128" comment="Full action name"/>
+        <column xsi:type="varchar" name="outcome" nullable="false" length="32" comment="Outcome"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="requests" unsigned="true" nullable="false" default="0" comment="Requests"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="day"/>
+            <column name="page_type"/>
+            <column name="outcome"/>
+            <column name="store_id"/>
+        </constraint>
+    </table>
+    <table name="storvixlabs_cacheinsight_cause" resource="default" engine="innodb" comment="StorvixLabs Cache Insight: blocks and cookies seen on misses">
+        <column xsi:type="date" name="day" nullable="false" comment="Day (UTC)"/>
+        <column xsi:type="varchar" name="kind" nullable="false" length="16" comment="block, cookie or set_cookie"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="190" comment="Block name or cookie name"/>
+        <column xsi:type="varchar" name="page_type" nullable="false" length="128" comment="Full action name"/>
+        <column xsi:type="int" name="requests" unsigned="true" nullable="false" default="0" comment="Requests"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="day"/>
+            <column name="kind"/>
+            <column name="name"/>
+            <column name="page_type"/>
+        </constraint>
+    </table>
+</schema>

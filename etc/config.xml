@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <storvixlabs_cacheinsight>
+            <general>
+                <enabled>0</enabled>
+                <hit_sample_percent>5</hit_sample_percent>
+                <excluded_actions>customer_*, checkout_*, sales_*, wishlist_*, multishipping_*, paypal_*, newsletter_*, review_customer_*, contact_index_post</excluded_actions>
+                <retention_days>30</retention_days>
+            </general>
+        </storvixlabs_cacheinsight>
+    </default>
+</config>

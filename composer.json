@@ -1,0 +1,19 @@
+{
+    "name": "storvixlabs/module-cache-insight",
+    "description": "Full-page cache diagnostics: logs cache misses by page type and shows which blocks and cookies keep pages out of the cache.",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": ["MIT", "OSL-3.0"],
+    "require": {
+        "php": "~8.3.0||~8.4.0||~8.5.0",
+        "magento/framework": "*",
+        "magento/module-backend": "*",
+        "magento/module-page-cache": "*"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": {
+            "StorvixLabs\\CacheInsight\\": ""
+        }
+    }
+}

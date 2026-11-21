@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="storvixlabs_cacheinsight_report" xsi:type="object">StorvixLabs\CacheInsight\Console\Command\Report</item>
+                <item name="storvixlabs_cacheinsight_reset" xsi:type="object">StorvixLabs\CacheInsight\Console\Command\Reset</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="StorvixLabs\CacheInsight\Console\Command\Report">
+        <arguments>
+            <argument name="reader" xsi:type="object">StorvixLabs\CacheInsight\Model\Report\Reader\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="StorvixLabs\CacheInsight\Console\Command\Reset">
+        <arguments>
+            <argument name="storage" xsi:type="object">StorvixLabs\CacheInsight\Model\Storage\Proxy</argument>
+        </arguments>
+    </type>
+</config>

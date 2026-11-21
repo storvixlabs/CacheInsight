@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="storvixlabs_cacheinsight" translate="label" sortOrder="960" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Cache Insight</label>
+            <tab>advanced</tab>
+            <resource>StorvixLabs_CacheInsight::config</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1">
+                <label>Full-Page Cache Diagnostics</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Enable Logging</label>
+                    <comment>Adds one small database write to every storefront page request that is not served from the cache. Turn it on while diagnosing, off afterwards.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="hit_sample_percent" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>Cache Hits Sampled (%)</label>
+                    <comment>With the built-in cache, hits are counted for this share of requests and scaled up, to keep the hit path fast. 0 = do not count hits. With Varnish, PHP never sees hits, so only misses are logged.</comment>
+                    <validate>validate-digits validate-digits-range digits-range-0-100</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="excluded_actions" translate="label comment" type="textarea" sortOrder="30" showInDefault="1" canRestore="1">
+                    <label>Ignored Pages</label>
+                    <comment>Comma-separated action names, * allowed (customer_*). These pages are private by design, so they are left out of the report.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="retention_days" translate="label" type="text" sortOrder="40" showInDefault="1" canRestore="1">
+                    <label>Keep Data (days)</label>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

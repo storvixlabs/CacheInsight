@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="StorvixLabs_CacheInsight::report" title="Cache Insight" translate="title"
+             module="StorvixLabs_CacheInsight" sortOrder="20" parent="Magento_Backend::system_tools"
+             action="storvixlabs_cacheinsight/report/index" resource="StorvixLabs_CacheInsight::report"/>
+    </menu>
+</config>
